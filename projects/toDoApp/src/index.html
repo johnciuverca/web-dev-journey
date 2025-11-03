@@ -1,11 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    
+    <ul id="todo-list">
+        <!-- To-Do items will be dynamically inserted here -->
+    </ul>
+
+    <input type="text" id="new-todo" placeholder="Add new to-do item">
+    <button id="add-todo">Add</button>
+
+    <script>
+
+        let localStorageData = readLocalStorage();
+        let counter = getMaxKey(Object.keys(localStorageData)) + 1;
+
+        console.log('Local Storage Data:', localStorageData);
+
+        const todoList = document.getElementById('todo-list');
+
+        for (const key in localStorageData) {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${key}: ${localStorageData[key]}`;
+            todoList.appendChild(listItem);
+        }
+
+        const addButton = document.getElementById('add-todo');
+        const newTodoInput = document.getElementById('new-todo');
+
+        addButton.addEventListener('click', () => {
+            const newTodo = newTodoInput.value.trim();
+
+            if (newTodo === '') return; // Do not add empty items
+            localStorage.setItem(counter++, newTodo);
+
+            refreshContent();
+        });
+
+        function refreshContent() {
+            window.location.reload();
+        }
+
+        function readLocalStorage() {
+
+            let result = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+
+                try {
+                    result[key] = JSON.parse(value);
+                } catch (e) {
+                    result[key] = value;
+                }
+            }
+            return result;
+        }
+
+
+
+        function getMaxKey(keys) {
+            const numericKeys = keys.map(key => parseInt(key)).filter(num => !isNaN(num));
+            if (numericKeys.length === 0)
+                return 0;
+            return Math.max(...numericKeys);
+        }
+    </script>
 </body>
+
 </html>
