@@ -15,38 +15,32 @@
     <input type="text" id="new-todo" placeholder="Add new to-do item">
     <button id="add-todo">Add</button>
 
-    <script>
-        const localStoragePrefix = 'todo_';
+    <script type='module'>
 
-        let localStorageData = readLocalStorage();
-        let counter = nextAvailableKey(localStorageData);
+        import { importData, saveItem, removeItem, updateItem } from './data.js';
 
-        const todoList = document.getElementById('todo-list');
-        todoList.innerHTML = ''; // Clear existing list items
-
-        loadData(localStorageData, todoList);
-
-        const addButton = document.getElementById('add-todo');
-        const newTodoInput = document.getElementById('new-todo');
+        loadData();
         initAddButton();
 
         function refreshContent() {
             window.location.reload();
         }
 
-        function loadData(data, targetElement) {
-            const myData = selectMyStorageData(data);
+        function loadData() {
+            const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = ''; // Clear existing list items
+            const myData = importData();
             for (const key in myData) {
                 const todoItem = createTodoItem(key, myData[key]);
-                targetElement.appendChild(todoItem);
+                todoList.appendChild(todoItem);
             }
         }
 
         function initAddButton() {
             const addButton = document.getElementById('add-todo');
+            const newTodoInput = document.getElementById('new-todo');
             addButton.addEventListener('click', () => {
-                addItemToStorage(counter, newTodoInput.value);
-                counter++;
+                saveItem(newTodoInput.value);
 
                 refreshContent();
             });
@@ -57,6 +51,9 @@
 
             const deleteButton = createDeleteButton(key);
             listItem.appendChild(deleteButton);
+
+            const editButton = createEditButton(key);
+            listItem.appendChild(editButton);
 
             const textLabel = document.createElement('span');
             textLabel.textContent = `${key}: ${value}`;
@@ -69,75 +66,24 @@
             const button = document.createElement('button');
             button.textContent = 'Delete';
             button.addEventListener('click', () => {
-                removeItemFromStorage(key);
+                removeItem(key);
                 refreshContent();
             });
             return button;
         }
 
-        function selectMyStorageData(data) {
-            let result = {};
-            for (const key in data) {
-                if (key.startsWith(localStoragePrefix)) {
-                    const sanitizedKey = unsecureKey(key);
-                    result[sanitizedKey] = data[key];
+        function createEditButton(key) {
+            const button = document.createElement('button');
+            button.textContent = 'Edit';
+            button.addEventListener('click', () => {
+                const newValue = prompt('Enter new value:');
+                if (newValue !== null) {
+                    updateItem(key, newValue);
+                    refreshContent();
                 }
-            }
-            return result;
+            });
+            return button;
         }
-
-        function addItemToStorage(key, value) {
-            const newTodo = value.trim();
-            if (newTodo === '') return;
-            const fullKey = secureKey(key);
-            localStorage.setItem(fullKey, newTodo);
-        }
-
-        function removeItemFromStorage(key) {
-            const fullKey = secureKey(key);
-            localStorage.removeItem(fullKey);
-        }
-
-        function readLocalStorage() {
-            let result = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                const value = localStorage.getItem(key);
-
-                try {
-                    result[key] = JSON.parse(value);
-                } catch (e) {
-                    result[key] = value;
-                }
-            }
-            return result;
-        }
-
-        function secureKey(key) {
-            return localStoragePrefix + key;
-        }
-
-        function unsecureKey(key) {
-            if (key.startsWith(localStoragePrefix)) {
-                return key.slice(localStoragePrefix.length);
-            }
-            return key;
-        }
-
-        function nextAvailableKey(localStorageData) {
-            let sanitizedKeys = Object.keys(localStorageData)
-                .filter(key => key.startsWith(localStoragePrefix))
-                .map(key => unsecureKey(key));
-            return getMaxKey(sanitizedKeys) + 1;
-        }
-
-        function getMaxKey(keys) {
-            const numericKeys = keys.map(key => parseInt(key)).filter(num => !isNaN(num));
-            if (numericKeys.length === 0)
-                return 0;
-            return Math.max(...numericKeys);
-        }
-
     </script>
 </body>
 
