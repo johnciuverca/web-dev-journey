@@ -15,6 +15,8 @@
     <input type="text" id="new-todo" placeholder="Add new to-do item">
     <button id="add-todo">Add</button>
 
+
+
     <script type='module'>
 
         import { importData, saveItem, removeItem, updateItem } from './data.js';
@@ -34,6 +36,16 @@
                 const todoItem = createTodoItem(key, myData[key]);
                 todoList.appendChild(todoItem);
             }
+
+            const existingClearButton = document.getElementById("del");
+            const buttonExists = existingClearButton !== null;
+            const hasElements = Object.entries(myData).length > 0;
+            if (!buttonExists && hasElements) {
+                const clearAllButton = createClearAllButton();
+                clearAllButton.setAttribute("id", "del");
+                todoList.appendChild(clearAllButton);
+            }
+
         }
 
         function initAddButton() {
@@ -48,6 +60,7 @@
 
         function createTodoItem(key, value) {
             const listItem = document.createElement('li');
+            listItem.setAttribute("id", key);
 
             const deleteButton = createDeleteButton(key);
             listItem.appendChild(deleteButton);
@@ -56,7 +69,7 @@
             listItem.appendChild(editButton);
 
             const textLabel = document.createElement('span');
-            textLabel.textContent = `${key}: ${value}`;
+            textLabel.textContent = `.   ${value}`;
             listItem.appendChild(textLabel);
 
             return listItem;
@@ -85,6 +98,22 @@
                 }
             });
             return button;
+        }
+
+        function createClearAllButton() {
+            const clearAllButtom = document.createElement('button');
+            clearAllButtom.textContent = 'Clear All';
+            clearAllButtom.addEventListener('click', () => {
+                const toDoListItem = document.getElementById('todo-list');
+                for (let i = 0; i < toDoListItem.children.length; i++) {
+                    const child = toDoListItem.children[i];
+                    const key = child.getAttribute("id");
+                    removeItem(key);
+                }
+                refreshContent();
+            });
+
+            return clearAllButtom;
         }
     </script>
 </body>

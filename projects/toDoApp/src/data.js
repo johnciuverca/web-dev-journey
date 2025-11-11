@@ -13,18 +13,25 @@ export function saveItem(value) {
     if (newTodo === '') return;
     const fullKey = secureKey(key);
     localStorage.setItem(fullKey, newTodo);
+    return key;
 }
 
 export function removeItem(key) {
-    const fullKey = secureKey(key);
-    localStorage.removeItem(fullKey);
+    try {
+        const fullKey = secureKey(key);
+        localStorage.removeItem(fullKey);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 export function updateItem(key, newValue) {
     const fullKey = secureKey(key);
     const updatedTodo = newValue.trim();
-    if (updatedTodo === '') return;
+    if (updatedTodo === '') return false;
     localStorage.setItem(fullKey, updatedTodo);
+    return true;
 }
 
 /* helpers */
