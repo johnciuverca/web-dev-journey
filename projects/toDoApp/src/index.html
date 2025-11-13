@@ -5,117 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="app.js" type="module"> </script>
 </head>
 
 <body>
+    <input type="text" id="filter" placeholder="Insert 'begins with' filter">
+    <button id="apply-filter">Apply Filter</button>
     <ul id="todo-list">
         <!-- To-Do items will be dynamically inserted here -->
     </ul>
 
     <input type="text" id="new-todo" placeholder="Add new to-do item">
     <button id="add-todo">Add</button>
-
-
-
-    <script type='module'>
-
-        import { importData, saveItem, removeItem, updateItem } from './data.js';
-
-        loadData();
-        initAddButton();
-
-        function refreshContent() {
-            window.location.reload();
-        }
-
-        function loadData() {
-            const todoList = document.getElementById('todo-list');
-            todoList.innerHTML = ''; // Clear existing list items
-            const myData = importData();
-            for (const key in myData) {
-                const todoItem = createTodoItem(key, myData[key]);
-                todoList.appendChild(todoItem);
-            }
-
-            const existingClearButton = document.getElementById("del");
-            const buttonExists = existingClearButton !== null;
-            const hasElements = Object.entries(myData).length > 0;
-            if (!buttonExists && hasElements) {
-                const clearAllButton = createClearAllButton();
-                clearAllButton.setAttribute("id", "del");
-                todoList.appendChild(clearAllButton);
-            }
-
-        }
-
-        function initAddButton() {
-            const addButton = document.getElementById('add-todo');
-            const newTodoInput = document.getElementById('new-todo');
-            addButton.addEventListener('click', () => {
-                saveItem(newTodoInput.value);
-
-                refreshContent();
-            });
-        }
-
-        function createTodoItem(key, value) {
-            const listItem = document.createElement('li');
-            listItem.setAttribute("id", key);
-
-            const deleteButton = createDeleteButton(key);
-            listItem.appendChild(deleteButton);
-
-            const editButton = createEditButton(key);
-            listItem.appendChild(editButton);
-
-            const textLabel = document.createElement('span');
-            textLabel.textContent = `.   ${value}`;
-            listItem.appendChild(textLabel);
-
-            return listItem;
-        }
-
-        function createDeleteButton(key) {
-            const button = document.createElement('button');
-            button.textContent = 'Delete';
-            button.addEventListener('click', () => {
-                const confirmed = confirm('Are you sure you want to delete this item?');
-                if (!confirmed) return;
-                removeItem(key);
-                refreshContent();
-            });
-            return button;
-        }
-
-        function createEditButton(key) {
-            const button = document.createElement('button');
-            button.textContent = 'Edit';
-            button.addEventListener('click', () => {
-                const newValue = prompt('Enter new value:');
-                if (newValue !== null) {
-                    updateItem(key, newValue);
-                    refreshContent();
-                }
-            });
-            return button;
-        }
-
-        function createClearAllButton() {
-            const clearAllButtom = document.createElement('button');
-            clearAllButtom.textContent = 'Clear All';
-            clearAllButtom.addEventListener('click', () => {
-                const toDoListItem = document.getElementById('todo-list');
-                for (let i = 0; i < toDoListItem.children.length; i++) {
-                    const child = toDoListItem.children[i];
-                    const key = child.getAttribute("id");
-                    removeItem(key);
-                }
-                refreshContent();
-            });
-
-            return clearAllButtom;
-        }
-    </script>
 </body>
 
 </html>
