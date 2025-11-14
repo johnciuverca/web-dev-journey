@@ -15,7 +15,7 @@ function loadData(data) {
     const todoList = document.getElementById('todo-list');
     todoList.innerHTML = ''; // Clear existing list items
     for (const key in data) {
-        const todoItem = createTodoItem(key, myData[key]);
+        const todoItem = createTodoItem(key, data[key]);
         todoList.appendChild(todoItem);
     }
 
@@ -59,6 +59,7 @@ function createTodoItem(key, value) {
 
     const editButton = createEditButton(key);
     listItem.appendChild(editButton);
+
 
     const textLabel = document.createElement('span');
     textLabel.textContent = `.   ${value}`;
@@ -106,5 +107,7 @@ function createClearAllButton() {
     });
     return clearAllButtom;
 }
+
+
 
 
