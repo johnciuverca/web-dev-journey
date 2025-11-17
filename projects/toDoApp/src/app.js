@@ -5,7 +5,7 @@ const myData = dataStorage.readData();
 
 loadData(myData);
 initAddButton();
-initApplyFilterButton();
+initFilterInput();
 
 function refreshContent() {
     window.location.reload();
@@ -40,14 +40,20 @@ function initAddButton() {
     });
 }
 
-function initApplyFilterButton() {
-    const applyFilterButton = document.getElementById('apply-filter');
-    const newFilterInput = document.getElementById('filter');
-    applyFilterButton.addEventListener('click', () => {
-        const filterString = newFilterInput.value;
-        const filtered = filterItems(filterString);
+function initFilterInput() {
+    const filterInput = document.getElementById('filter');
+
+    const inputHandler = event => {
+        const filterText = filterInput.value;
+        const filtered = filterItems(filterText);
         loadData(filtered);
-    })
+    };
+
+    const deboundcedInputHandler = debounce(() => {
+        inputHandler();
+    });
+
+    filterInput.addEventListener('input', deboundcedInputHandler);
 }
 
 function createTodoItem(key, value) {
@@ -108,6 +114,13 @@ function createClearAllButton() {
     return clearAllButtom;
 }
 
-
-
+function debounce(callback) {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            callback();
+        }, 500);
+    }
+}
 
