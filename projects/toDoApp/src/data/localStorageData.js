@@ -34,19 +34,7 @@ export function updateItem(key, newValue) {
     return true;
 }
 
-export function filterItems(filterString) {
-    const initialData = importData();
-    const result = [];
-    for (let key in initialData) {
-        const value = initialData[key];
-        //if item meets criteria then add to result
-        if (value.startsWith(filterString)) {
-            result.push(value);
-        }
-    }
-    return result;
 
-}
 /* helpers */
 
 

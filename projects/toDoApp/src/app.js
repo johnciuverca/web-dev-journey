@@ -1,5 +1,10 @@
-import { dataStorage } from "./containerManager.js";
-import { filterItems } from "./localStorageData.js";
+import { dataStorage } from "./framework/containerManager.js";
+import { refreshContent } from "./framework/utils.js";
+import { filterItems } from "./framework/utils.js";
+import { debounce } from "./framework/utils.js";
+import { createTodoItem } from "./components/toDoItem.js";
+import { createClearAllButton } from "./components/clearAllButton.js";
+
 
 const myData = dataStorage.readData();
 
@@ -7,13 +12,9 @@ loadData(myData);
 initAddButton();
 initFilterInput();
 
-function refreshContent() {
-    window.location.reload();
-}
-
 function loadData(data) {
     const todoList = document.getElementById('todo-list');
-    todoList.innerHTML = ''; // Clear existing list items
+    todoList.innerHTML = '';
     for (const key in data) {
         const todoItem = createTodoItem(key, data[key]);
         todoList.appendChild(todoItem);
@@ -56,71 +57,6 @@ function initFilterInput() {
     filterInput.addEventListener('input', deboundcedInputHandler);
 }
 
-function createTodoItem(key, value) {
-    const listItem = document.createElement('li');
-    listItem.setAttribute("id", key);
-
-    const deleteButton = createDeleteButton(key);
-    listItem.appendChild(deleteButton);
-
-    const editButton = createEditButton(key);
-    listItem.appendChild(editButton);
 
 
-    const textLabel = document.createElement('span');
-    textLabel.textContent = `.   ${value}`;
-    listItem.appendChild(textLabel);
-
-    return listItem;
-}
-
-function createDeleteButton(key) {
-    const button = document.createElement('button');
-    button.textContent = 'Delete';
-    button.addEventListener('click', () => {
-        const confirmed = confirm('Are you sure you want to delete this item?');
-        if (!confirmed) return;
-        dataStorage.deleteData(key);
-        refreshContent();
-    });
-    return button;
-}
-
-function createEditButton(key) {
-    const button = document.createElement('button');
-    button.textContent = 'Edit';
-    button.addEventListener('click', () => {
-        const newValue = prompt('Enter new value:');
-        if (newValue !== null) {
-            dataStorage.updateData(key, newValue);
-            refreshContent();
-        }
-    });
-    return button;
-}
-
-function createClearAllButton() {
-    const clearAllButtom = document.createElement('button');
-    clearAllButtom.textContent = 'Clear All';
-    clearAllButtom.addEventListener('click', () => {
-        const toDoListItem = document.getElementById('todo-list');
-        for (let i = 0; i < toDoListItem.children.length; i++) {
-            const child = toDoListItem.children[i];
-            const key = child.getAttribute("id");
-            dataStorage.deleteData(key);
-        }
-        refreshContent();
-    });
-    return clearAllButtom;
-}
-
-function debounce(callback) {
-    let timeoutId;
-    return function () {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            callback();
-        }, 500);
-    }
-}
 
